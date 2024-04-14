@@ -34,8 +34,10 @@ const JobFilterSidebar = async ({ defaultValues }: JobFilterSideBarProps) => {
     )) as string[];
   return (
     <aside className="sticky top-0 h-fit rounded-lg border bg-background p-4 md:w-[260px]">
-      <form action={filterJobs}>
-        {" "}
+      {/* 
+      key is used to reset the form when the defaultValues change
+      */}
+      <form action={filterJobs} key={JSON.stringify(defaultValues)}>
         {/* when use server action like this nextjs put fake input inside form so use div inside form to style it*/}
         <div className="space-y-4">
           <div className="flex flex-col gap-2">
