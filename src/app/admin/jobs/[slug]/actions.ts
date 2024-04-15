@@ -28,6 +28,7 @@ export async function approveSubmission(
       where: { id: jobId },
       data: { approved: true },
     });
+    revalidatePath("/admin");
     revalidatePath("/");
   } catch (error) {
     let message = "Unexpected error";
