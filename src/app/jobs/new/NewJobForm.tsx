@@ -20,6 +20,8 @@ import { X } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import RichTextEditor from "@/components/RichTextEditor";
 import { draftToMarkdown } from "markdown-draft-js";
+import LoadingButton from "@/components/LoadingButton";
+import { createJobPosting } from "./actions";
 const NewJobForm = () => {
   const form = useForm<CreateJobValues>({
     resolver: zodResolver(createJobSchema),
@@ -34,7 +36,18 @@ const NewJobForm = () => {
     formState: { isSubmitting },
   } = form;
   const onSubmit = async (values: CreateJobValues) => {
-    alert(JSON.stringify(values, null, 2));
+    const formData = new FormData();
+    Object.entries(values).forEach(([key, value]) => {
+      if (value) {
+        formData.append(key, value);
+      }
+    });
+
+    try {
+      await createJobPosting(formData);
+    } catch (error) {
+      alert("An error occurred. Please try again.");
+    }
   };
 
   return (
@@ -134,7 +147,16 @@ const NewJobForm = () => {
                 <FormItem>
                   <FormLabel>Location</FormLabel>
                   <FormControl>
-                    <Select {...field} defaultValue="">
+                    <Select
+                      {...field}
+                      defaultValue=""
+                      onChange={(e) => {
+                        field.onChange(e);
+                        if (e.currentTarget.value === "Remote") {
+                          trigger("location");
+                        }
+                      }}
+                    >
                       <option value="" hidden>
                         Select an option
                       </option>
@@ -234,7 +256,9 @@ const NewJobForm = () => {
                   </Label>
                   <FormControl>
                     <RichTextEditor
-                      onChange={(draft) => draftToMarkdown(draft)}
+                      onChange={(draft) =>
+                        field.onChange(draftToMarkdown(draft))
+                      }
                       ref={field.ref}
                     />
                   </FormControl>
@@ -255,7 +279,9 @@ const NewJobForm = () => {
                 </FormItem>
               )}
             />
-            <button type="submit">y</button>
+            <LoadingButton type="submit" loading={isSubmitting}>
+              Submit
+            </LoadingButton>
           </form>
         </Form>
       </div>
