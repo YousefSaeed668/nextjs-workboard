@@ -28,6 +28,13 @@ export async function generateMetadata({
     title: job.title,
   };
 }
+export async function generateStaticParams() {
+  const jobs = await prisma.job.findMany({
+    where: { approved: true },
+    select: { slug: true },
+  });
+  return jobs.map(({ slug }) => slug);
+}
 const Page = async ({ params: { slug } }: PageProps) => {
   const job = await getJob(slug);
   const { applicationEmail, applicationUrl } = job;
